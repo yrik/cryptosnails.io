@@ -1,0 +1,101 @@
+<head>
+<title>Crypto Snails - Earn $snail crypto by playing the game</title>
+
+<link rel="icon" 
+      type="image/png" 
+      href="https://cryptosnails.io/snail-icon.png">
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+<script src="https://npmcdn.com/moralis@0.0.6/dist/moralis.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+  // connect to Moralis server
+  Moralis.initialize("JBfxbweoLK5be7xnZineX05Z3MRAPBoIohXvvqgX");
+  Moralis.serverURL = "https://vqntw2bxdpp2.bigmoralis.com:2053/server";
+
+  async function start() {
+    let user = Moralis.User.current();
+    if (user) {
+      // start game
+      await launch(user)
+    }
+    else {
+      // show auth window
+      $("#login-screen").show()
+      user = await Moralis.Web3.authenticate();
+      $("#login-screen").hide()
+      await launch(user)
+    }
+
+  }
+
+  const config = {
+      type: Phaser.AUTO,
+      physics: {
+          default: 'arcade',
+          arcade: {
+              gravity: { y: 300 },
+              debug: false
+          }
+      },
+      scale: {
+          mode: Phaser.Scale.FIT,
+          parent: 'phaser-example',
+          autoCenter: Phaser.Scale.CENTER_BOTH,
+          width: 800,
+          height: 600
+      },
+      scene: {
+          preload: preload,
+          create: create,
+          update: update
+      }
+  };
+
+  async function preload () {}
+  async function create () {}
+  async function update () {}
+
+  async function launch(user) {
+    const game = new Phaser.Game(config);
+
+    game.setInteractive().on('pointerdown', function() {
+    if (scene.scale.isFullscreen) {
+        scene.scale.stopFullscreen();
+        // On stop fulll screen
+    } else {
+        scene.scale.startFullscreen();
+        // On start fulll screen
+    }
+});
+  }
+
+  start()
+
+</script>
+
+<style>
+
+</style>
+
+</head>
+
+<body>
+
+<div class="flex h-screen hidden" id="login-screen">
+  <div class="m-auto">
+    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4
+      rounded" onClick="login()">login with metamask</button>
+  </div>
+</div>
+
+<div id="phaser"><div>
+
+</body>
