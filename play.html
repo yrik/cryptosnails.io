@@ -31,7 +31,7 @@
   <button class="p-2 mr-2" onClick="login()">login with metamask</button>
 </div>
 
-<div style="height: calc(100% - 60px);" id="phaser" onClick="if(!user){login()}"><div>
+<div style="height: calc(100% - 60px);" id="phaser" onClick="if(!Moralis.User.current()){login()}"><div>
 
 <script>
   // connect to Moralis server
@@ -39,10 +39,10 @@
   Moralis.serverURL = "https://vqntw2bxdpp2.bigmoralis.com:2053/server";
   Moralis.Web3.getSigningData = () => 'Sign in to CryptoSnails.io'
 
-  let user;
+  const PlayerPosition = Moralis.Object.extend("PlayerPosition");
 
   async function start() {
-    user = Moralis.User.current();
+    const user = Moralis.User.current();
     if (user) {
       $("#logout-screen").show()
     }
@@ -157,13 +157,22 @@
       .setScrollFactor(0);
 
     if (user) {
-      player = this.physics.add.image(300, 300, 'player').setScale(0.25)//.refreshBody();
+      let lastQuery = new Moralis.Query('PlayerPosition')
+      lastQuery.equalTo("player", user.get("ethAddress"))
+      const lastPosition = await lastQuery.descending("createdAt").first()
+      let lastX = 300
+      let lastY = 300
+      if (lastPosition && lastPosition.get('x') && lastPosition.get('y')) {
+        lastX = lastPosition.get('x')
+        lastY = lastPosition.get('y')
+      }
+
+      player = this.physics.add.image(lastX, lastY, 'player').setScale(0.25).refreshBody();
 
       this.physics.add.collider(player, wallsLayer);
       this.physics.add.collider(player, edgeLayer);
       camera.startFollow(player)
 
-      let user = Moralis.User.current();
       let query = new Moralis.Query('PlayerPosition');
       let subscription = await query.subscribe();
 
@@ -218,7 +227,6 @@
       let user = Moralis.User.current();
       
       if (user) {
-        const PlayerPosition = Moralis.Object.extend("PlayerPosition");
         const playerPosition = new PlayerPosition();
 
         playerPosition.set("player",user.get("ethAddress"));
