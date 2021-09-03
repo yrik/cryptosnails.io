@@ -27,14 +27,11 @@
   <button class="p-2 mr-2" onClick="logout()">logout</button>
 </div>
 
-<div class="flex h-screen hidden" id="login-screen">
-  <div class="m-auto">
-    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4
-      rounded" onClick="login()">login with metamask</button>
-  </div>
+<div class="flex text-right hidden" id="login-screen">
+  <button class="p-2 mr-2" onClick="login()">login with metamask</button>
 </div>
 
-<div style="height: calc(100% - 60px);" id="phaser"><div>
+<div style="height: calc(100% - 60px);" id="phaser" onClick="if(!user){login()}"><div>
 
 <script>
   // connect to Moralis server
@@ -42,18 +39,17 @@
   Moralis.serverURL = "https://vqntw2bxdpp2.bigmoralis.com:2053/server";
   Moralis.Web3.getSigningData = () => 'Sign in to CryptoSnails.io'
 
+  let user;
+
   async function start() {
-    let user = Moralis.User.current();
+    user = Moralis.User.current();
     if (user) {
-      // start game
       $("#logout-screen").show()
-      await launch(user)
     }
     else {
-      // show auth window
-      $("#login-screen").removeClass('hidden').addClass('flex')
+      $("#login-screen").show()
     }
-
+    await launch()
   }
   async function logout(){
     await Moralis.User.logOut();
@@ -63,9 +59,12 @@
   async function login(){
     user = await Moralis.Web3.authenticate();
     if (user) {
+      location.reload()
+      /*
       await $("#login-screen").hide()
       $("#logout-screen").show()
-      await launch(user)
+      await launch()
+      */
     }
   }
 
@@ -107,6 +106,7 @@
     const size = 25
     const indexes = [...Array(size).keys()]
 
+    let user = Moralis.User.current();
 
     const backgroundTileMap = this.make.tilemap({ 
       data: indexes.map( _ => indexes.map( _ => 4)), 
@@ -148,7 +148,7 @@
 
     // Help text that has a "fixed" position on the screen
     this.add
-      .text(16, 16, "Arrow keys to scroll", {
+      .text(16, 16, "Arrow keys to move", {
         font: "12px monospace",
         fill: "#ffffff",
         padding: { x: 10, y: 5 },
@@ -156,35 +156,36 @@
       })
       .setScrollFactor(0);
 
-    //this.add.image(300, 300, 'player').setScale(0.25)
-    player = this.physics.add.image(300, 300, 'player').setScale(0.25)//.refreshBody();
+    if (user) {
+      player = this.physics.add.image(300, 300, 'player').setScale(0.25)//.refreshBody();
 
-    this.physics.add.collider(player, wallsLayer);
-    this.physics.add.collider(player, edgeLayer);
-    camera.startFollow(player)
+      this.physics.add.collider(player, wallsLayer);
+      this.physics.add.collider(player, edgeLayer);
+      camera.startFollow(player)
 
-    let user = Moralis.User.current();
-    let query = new Moralis.Query('PlayerPosition');
-    let subscription = await query.subscribe();
+      let user = Moralis.User.current();
+      let query = new Moralis.Query('PlayerPosition');
+      let subscription = await query.subscribe();
 
-    subscription.on('create', (position) => {
-      let x = position.get("x")
-      let y = position.get("y")
-      let addr = position.get("player")
-      let currentUserAddr = user ? user.get("ethAddress") : undefined;
+      subscription.on('create', (position) => {
+        let x = position.get("x")
+        let y = position.get("y")
+        let addr = position.get("player")
+        let currentUserAddr = user ? user.get("ethAddress") : undefined;
 
-      // move competitors
-      if(addr != currentUserAddr){
-        // if first time seeing
-        if(competitors[addr] == undefined){
-          competitors[addr] = this.add.image(x, y, 'player').setScale(0.20);
+        // move competitors
+        if(addr != currentUserAddr){
+          // if first time seeing
+          if(competitors[addr] == undefined){
+            competitors[addr] = this.add.image(x, y, 'player').setScale(0.20);
+          }
+          else{
+            competitors[addr].x = x;
+            competitors[addr].y = y;
+          }
         }
-        else{
-          competitors[addr].x = x;
-          competitors[addr].y = y;
-        }
-      }
-    });
+      });
+    }
 
   }
 
@@ -233,7 +234,7 @@
 
   }
 
-  async function launch(user) {
+  async function launch() {
     const game = new Phaser.Game(config);
   }
 
