@@ -116,7 +116,7 @@
 
     const wallsTileMap= this.make.tilemap({ 
       data: indexes.map( row => indexes.map( col => {
-        if (row % 4 == Math.floor(Math.random() * 3) && col % Math.floor(Math.random() * 2) == 0) return 8
+        if (row % 4 == Math.floor(Math.random() * 2) && col % Math.floor(Math.random() * 5) == 0) return 8
       })),
       tileWidth: 32, tileHeight: 32, tileMargin: 0, tileSpacing: 0, 
     })
@@ -127,7 +127,7 @@
 
     const edgeTileMap = this.make.tilemap({ 
       data: indexes.map( row => indexes.map( col => {
-       if(row == 0 || row == size || col == 0 || col == size) return 3 
+       if(row == 0 || row == size-1 || col == 0 || col == size-1) return 3 
       })), 
       tileWidth: 32, tileHeight: 32, tileMargin: 0, tileSpacing: 0, 
     })
