@@ -95,6 +95,7 @@
 
   let player;
   let cursors;
+  const competitors = {};
 
   async function preload () {
       this.load.image("player", "./basic-snail.svg");
@@ -103,7 +104,7 @@
 
   async function create () {
 
-    const size = 100
+    const size = 25
     const indexes = [...Array(size).keys()]
 
 
@@ -156,11 +157,35 @@
       .setScrollFactor(0);
 
     //this.add.image(300, 300, 'player').setScale(0.25)
-    player = this.physics.add.image(300, 300, 'player').setScale(0.25).refreshBody();
+    player = this.physics.add.image(300, 300, 'player').setScale(0.25)//.refreshBody();
 
     this.physics.add.collider(player, wallsLayer);
     this.physics.add.collider(player, edgeLayer);
     camera.startFollow(player)
+
+    let user = Moralis.User.current();
+    let query = new Moralis.Query('PlayerPosition');
+    let subscription = await query.subscribe();
+
+    subscription.on('create', (position) => {
+      let x = position.get("x")
+      let y = position.get("y")
+      let addr = position.get("player")
+      let currentUserAddr = user ? user.get("ethAddress") : undefined;
+
+      // move competitors
+      if(addr != currentUserAddr){
+        // if first time seeing
+        if(competitors[addr] == undefined){
+          competitors[addr] = this.add.image(x, y, 'player').setScale(0.20);
+        }
+        else{
+          competitors[addr].x = x;
+          competitors[addr].y = y;
+        }
+      }
+    });
+
   }
 
 
@@ -173,23 +198,37 @@
     {
         player.setVelocityX(-160);
         player.setFlip(false, false)
-
     }
     else if (cursors.right.isDown)
     {
         player.setVelocityX(160);
         player.setFlip(true, false)
-
     }
     else if (cursors.down.isDown)
     {
         player.setVelocityY(160);
-
     }
     else if (cursors.up.isDown)
     {
         player.setVelocityY(-160);
+    }
 
+    if(player.lastX!=player.x  || player.lastY!=player.y){
+      let user = Moralis.User.current();
+      
+      if (user) {
+        const PlayerPosition = Moralis.Object.extend("PlayerPosition");
+        const playerPosition = new PlayerPosition();
+
+        playerPosition.set("player",user.get("ethAddress"));
+        playerPosition.set("x",player.x);
+        playerPosition.set("y",player.y)
+
+        player.lastX = player.x;
+        player.lastY = player.y;
+
+        await playerPosition.save();
+      }
     }
 
   }
