@@ -103,7 +103,10 @@
 
   async function create () {
 
-    const size = 75
+    let levelQuery = new Moralis.Query('Level')
+    const level = await levelQuery.descending("createdAt").first()
+
+    const size = level.get('size')
     const indexes = [...Array(size).keys()]
 
     let user = Moralis.User.current();
@@ -116,9 +119,7 @@
     const backgroundLayer = backgroundTileMap.createLayer(0, backgroundTileSet, 0, 0); // layer index, tileset, x, y
 
     const wallsTileMap= this.make.tilemap({ 
-      data: indexes.map( row => indexes.map( col => {
-        if (row % 4 == Math.floor(Math.random() * 2) && col % Math.floor(Math.random() * 5) == 0) return 8
-      })),
+      data: level.get('data'),
       tileWidth: 32, tileHeight: 32, tileMargin: 0, tileSpacing: 0, 
     })
     const wallsTileSet = wallsTileMap.addTilesetImage("tiles")
