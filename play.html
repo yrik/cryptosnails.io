@@ -79,12 +79,22 @@
           width: 800,
           height: 600
       },
+       physics: {
+          default: 'arcade',
+          arcade: {
+              //gravity: { y: 300 },
+              debug: false
+          }
+      },
       scene: {
           preload: preload,
           create: create,
           update: update
       }
   };
+
+  let player;
+  let cursors;
 
   async function preload () {
       this.load.image("player", "./basic-snail.svg");
@@ -93,10 +103,13 @@
 
   async function create () {
 
-    const indexes = [...Array(100).keys()]
+    const size = 100
+    const indexes = [...Array(size).keys()]
+
 
     const backgroundTileMap = this.make.tilemap({ 
-      data: indexes.map( _ => indexes.map( _ => 4)), tileWidth: 32, tileHeight: 32 
+      data: indexes.map( _ => indexes.map( _ => 4)), 
+      tileWidth: 32, tileHeight: 32, tileMargin: 0, tileSpacing: 0, 
     })
     const backgroundTileSet = backgroundTileMap.addTilesetImage("tiles")
     const backgroundLayer = backgroundTileMap.createLayer(0, backgroundTileSet, 0, 0); // layer index, tileset, x, y
@@ -105,28 +118,32 @@
       data: indexes.map( row => indexes.map( col => {
         if (row % 4 == Math.floor(Math.random() * 3) && col % Math.floor(Math.random() * 2) == 0) return 8
       })),
-      tileWidth: 32, tileHeight: 32 
+      tileWidth: 32, tileHeight: 32, tileMargin: 0, tileSpacing: 0, 
     })
     const wallsTileSet = wallsTileMap.addTilesetImage("tiles")
     const wallsLayer = wallsTileMap.createLayer(0, wallsTileSet, 0, 0); // layer index, tileset, x, y
+    wallsLayer.setCollisionBetween(1, 50);
+
+
+    const edgeTileMap = this.make.tilemap({ 
+      data: indexes.map( row => indexes.map( col => {
+       if(row == 0 || row == size || col == 0 || col == size) return 3 
+      })), 
+      tileWidth: 32, tileHeight: 32, tileMargin: 0, tileSpacing: 0, 
+    })
+    const edgeTileSet = edgeTileMap.addTilesetImage("tiles")
+    const edgeLayer = edgeTileMap.createLayer(0, edgeTileSet, 0, 0); // layer index, tileset, x, y
+    edgeLayer.setCollisionBetween(1, 50);
 
 
     // Phaser supports multiple cameras, but you can access the default camera like this:
     const camera = this.cameras.main;
 
     // Set up the arrows to control the camera
-    const cursors = this.input.keyboard.createCursorKeys();
-    controls = new Phaser.Cameras.Controls.FixedKeyControl({
-      camera: camera,
-      left: cursors.left,
-      right: cursors.right,
-      up: cursors.up,
-      down: cursors.down,
-      speed: 0.5
-    });
+    cursors = this.input.keyboard.createCursorKeys();
 
     // Constrain the camera so that it isn't allowed to move outside the width/height of tilemap
-    //camera.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+    camera.setBounds(0, 0, backgroundTileMap.widthInPixels, backgroundTileMap.heightInPixels);
 
     // Help text that has a "fixed" position on the screen
     this.add
@@ -138,13 +155,43 @@
       })
       .setScrollFactor(0);
 
-    this.add.image(300, 300, 'player').setScale(0.25)
+    //this.add.image(300, 300, 'player').setScale(0.25)
+    player = this.physics.add.image(300, 300, 'player').setScale(0.25).refreshBody();
+
+    this.physics.add.collider(player, wallsLayer);
+    this.physics.add.collider(player, edgeLayer);
+    camera.startFollow(player)
   }
 
 
   async function update(time, delta) {
     // Apply the controls to the camera each update tick of the game
     //controls.update(delta);
+
+
+    if (cursors.left.isDown)
+    {
+        player.setVelocityX(-160);
+        player.setFlip(false, false)
+
+    }
+    else if (cursors.right.isDown)
+    {
+        player.setVelocityX(160);
+        player.setFlip(true, false)
+
+    }
+    else if (cursors.down.isDown)
+    {
+        player.setVelocityY(160);
+
+    }
+    else if (cursors.up.isDown)
+    {
+        player.setVelocityY(-160);
+
+    }
+
   }
 
   async function launch(user) {
