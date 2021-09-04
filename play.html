@@ -60,11 +60,6 @@
     user = await Moralis.Web3.authenticate();
     if (user) {
       location.reload()
-      /*
-      await $("#login-screen").hide()
-      $("#logout-screen").show()
-      await launch()
-      */
     }
   }
 
@@ -93,12 +88,26 @@
   };
 
   let player;
+  let coinScore = 0;
   let cursors;
+  let text;
+
   const competitors = {};
 
   async function preload () {
       this.load.image("player", "./basic-snail.svg");
+      this.load.image("coin", "./coin.png");
       this.load.image("tiles", "./sprite.png");
+  }
+
+  async function collectCoin(player, coin) {
+      coin.destroy(coin.x, coin.y); // remove the tile/coin
+      coinScore ++; // increment the score
+      let user = Moralis.User.current();
+      user.set('coinScore', coinScore) 
+      await user.save()
+      text.setText(`Coins collected: ${coinScore}`); // set the text to show the current score
+      return false;
   }
 
   async function create () {
@@ -118,7 +127,7 @@
     const backgroundTileSet = backgroundTileMap.addTilesetImage("tiles")
     const backgroundLayer = backgroundTileMap.createLayer(0, backgroundTileSet, 0, 0); // layer index, tileset, x, y
 
-    const wallsTileMap= this.make.tilemap({ 
+    const wallsTileMap = this.make.tilemap({ 
       data: level.get('data'),
       tileWidth: 32, tileHeight: 32, tileMargin: 0, tileSpacing: 0, 
     })
@@ -148,16 +157,26 @@
     camera.setBounds(0, 0, backgroundTileMap.widthInPixels, backgroundTileMap.heightInPixels);
 
     // Help text that has a "fixed" position on the screen
-    this.add
-      .text(16, 16, "Arrow keys to move", {
-        font: "12px monospace",
-        fill: "#ffffff",
-        padding: { x: 10, y: 5 },
-        backgroundColor: "#000000"
-      })
-      .setScrollFactor(0);
+
+    coins = this.physics.add.staticGroup()
+    let coinsQuery = new Moralis.Query('Coin')
+    const coinsData = await coinsQuery.find()
+    console.log('coinsData', coinsData)
+    coinsData.map(coinData => {
+      coins.create(coinData.get('x') * 32, coinData.get('y') * 32, "coin"); 
+    })
 
     if (user) {
+
+      coinScore = user.get('coinScore') || 0
+
+      text = this.add.text(16, 16, `Coins Collected: ${coinScore}`, {
+          font: "12px monospace",
+          fill: "#ffffff",
+          padding: { x: 10, y: 5 },
+          backgroundColor: "#000000"
+      }).setScrollFactor(0);
+
       let lastQuery = new Moralis.Query('PlayerPosition')
       lastQuery.equalTo("player", user.get("ethAddress"))
       const lastPosition = await lastQuery.descending("createdAt").first()
@@ -170,13 +189,13 @@
 
       player = this.physics.add.image(lastX, lastY, 'player').setScale(0.25).refreshBody();
 
+      this.physics.add.overlap(player, coins, collectCoin, null, this);
       this.physics.add.collider(player, wallsLayer);
       this.physics.add.collider(player, edgeLayer);
       camera.startFollow(player)
 
       let query = new Moralis.Query('PlayerPosition');
       let subscription = await query.subscribe();
-
       subscription.on('create', (position) => {
         let x = position.get("x")
         let y = position.get("y")
@@ -195,52 +214,69 @@
           }
         }
       });
-    }
 
+      let levelQuery = new Moralis.Query('Level');
+      let levelSubscription = await levelQuery.subscribe();
+      levelSubscription.on('create', (level) => {
+        console.log('New Level created')
+        // TODO: check if works
+        const size = level.get('size')
+        const indexes = [...Array(size).keys()]
+
+        /*
+        wallsLayer.layer.data = level.get('data')
+
+        backgroundLayer.layer.data = indexes.map( _ => indexes.map( _ => 4))
+
+        edgeLayer.layer.data = indexes.map( row => indexes.map( col => {
+           if(row == 0 || row == size-1 || col == 0 || col == size-1) return 3 
+          }))
+        */
+      });
+    }
   }
 
-
   async function update(time, delta) {
-    // Apply the controls to the camera each update tick of the game
-    //controls.update(delta);
 
-
-    if (cursors.left.isDown)
-    {
-        player.setVelocityX(-160);
-        player.setFlip(false, false)
-    }
-    else if (cursors.right.isDown)
-    {
-        player.setVelocityX(160);
-        player.setFlip(true, false)
-    }
-    else if (cursors.down.isDown)
-    {
-        player.setVelocityY(160);
-    }
-    else if (cursors.up.isDown)
-    {
-        player.setVelocityY(-160);
-    }
-
-    if(player.lastX!=player.x  || player.lastY!=player.y){
-      let user = Moralis.User.current();
-      
-      if (user) {
-        const playerPosition = new PlayerPosition();
-
-        playerPosition.set("player",user.get("ethAddress"));
-        playerPosition.set("x",player.x);
-        playerPosition.set("y",player.y)
-
-        player.lastX = player.x;
-        player.lastY = player.y;
-
-        await playerPosition.save();
+    if (cursors) {
+      if (cursors.left.isDown)
+      {
+          player.setVelocityX(-160);
+          player.setFlip(false, false)
+      }
+      else if (cursors.right.isDown)
+      {
+          player.setVelocityX(160);
+          player.setFlip(true, false)
+      }
+      else if (cursors.down.isDown)
+      {
+          player.setVelocityY(160);
+      }
+      else if (cursors.up.isDown)
+      {
+          player.setVelocityY(-160);
       }
     }
 
+    if (player) {
+      if(player.lastX!=player.x  || player.lastY!=player.y){
+        let user = Moralis.User.current();
+        
+        if (user) {
+          const playerPosition = new PlayerPosition();
+
+          playerPosition.set("player",user.get("ethAddress"));
+          playerPosition.set("x",player.x);
+          playerPosition.set("y",player.y)
+
+          player.lastX = player.x;
+          player.lastY = player.y;
+
+          await playerPosition.save();
+        }
+      }
+    }
   }
 
   async function launch() {
