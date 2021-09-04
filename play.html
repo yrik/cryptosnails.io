@@ -100,12 +100,25 @@
       this.load.image("tiles", "./sprite.png");
   }
 
+  async function claimCoins() {
+    alert("Moving coins to your account..")
+      await Moralis.Cloud.run("claimCoins")
+      let user = Moralis.User.current();
+      coinScore = 0;
+      user.set('coinScore', 0) 
+      await user.save()
+      text.setText(`Coins collected: ${coinScore}`); // set the text to show the current score
+  }
   async function collectCoin(player, coin) {
       coin.destroy(coin.x, coin.y); // remove the tile/coin
       coinScore ++; // increment the score
+
+      // TODO: move to server when it's possible to modify user there
       let user = Moralis.User.current();
       user.set('coinScore', coinScore) 
       await user.save()
+
+      await Moralis.Cloud.run("collectCoin", {x: coin.x/32, y: coin.y/32})
       text.setText(`Coins collected: ${coinScore}`); // set the text to show the current score
       return false;
   }
@@ -166,16 +179,16 @@
       coins.create(coinData.get('x') * 32, coinData.get('y') * 32, "coin"); 
     })
 
+    let coinsSubscription = await coinsQuery.subscribe();
+    coinsSubscription.on('create', (coinData) => {
+      console.log('created', coinData)
+      coins.create(coinData.get('x') * 32, coinData.get('y') * 32, "coin"); 
+      coins.refresh()
+    });
+
     if (user) {
 
       coinScore = user.get('coinScore') || 0
-
-      text = this.add.text(16, 16, `Coins Collected: ${coinScore}`, {
-          font: "12px monospace",
-          fill: "#ffffff",
-          padding: { x: 10, y: 5 },
-          backgroundColor: "#000000"
-      }).setScrollFactor(0);
 
       let lastQuery = new Moralis.Query('PlayerPosition')
       lastQuery.equalTo("player", user.get("ethAddress"))
@@ -233,6 +246,23 @@
           }))
         */
       });
+
+      text = this.add.text(16, 16, `Coins Collected: ${coinScore}`, {
+          font: "12px monospace",
+          fill: "#ffffff",
+          padding: { x: 10, y: 5 },
+          backgroundColor: "#000000"
+      }).setScrollFactor(0);
+
+      const claimButton = this.add.text(180, 16, `Claim`, {
+          font: "12px monospace",
+          fill: "#ffffff",
+          padding: { x: 10, y: 5 },
+          backgroundColor: "#000000"
+      }).setScrollFactor(0);
+
+      claimButton.setInteractive();
+      claimButton.on('pointerdown', claimCoins);
     }
   }
 
