@@ -1,4 +1,10 @@
-i
+Moralis.Cloud.define("getTokenData", async (request) => {
+      return Moralis.Cloud.httpRequest({
+      method: "GET",
+      url: request.params.tokenUri,
+    })
+});
+
 Moralis.Cloud.define("claimCoins", async (request) => {
   
   // TODO: send coins to the user
