@@ -31,7 +31,13 @@
   <button class="p-2 mr-2" onClick="login()">login with metamask</button>
 </div>
 
-<div style="height: calc(100% - 60px);" id="phaser" onClick="if(!Moralis.User.current()){login()}"><div>
+<div style="height: calc(100% - 60px);" id="phaser"
+  onClick="if(!Moralis.User.current()){login()}"></div>
+
+<div class="mr-2 p-2 text-center">
+  <br/><br/>
+<div id="leaderboard"></div>
+</div>
 
 <script>
   // connect to Moralis server
@@ -68,9 +74,9 @@
   const config = {
       type: Phaser.AUTO,
       //pixelArt: true,
+      parent: 'phaser',
       scale: {
           mode: Phaser.Scale.FIT,
-          parent: 'phaser',
           autoCenter: Phaser.Scale.CENTER_BOTH,
           width: 800,
           height: 600
@@ -327,8 +333,20 @@
     }
   }
 
+
+  async function getLeaderboard() {
+    const query = new Moralis.Query("User");
+    let users = await query.descending().limit(10).find();
+    console.log('users', users)
+    const text = users.map(user => `Player ${user.get('ethAddress')} has collected ${user.get('coinScore')} $Snail Tokens`).join("<br/>")
+    $("#leaderboard").html('<h4>Leaderboard</h4>' + text)
+  }
+
   async function launch() {
     const game = new Phaser.Game(config);
+
+
+    await getLeaderboard()
   }
 
   start()
