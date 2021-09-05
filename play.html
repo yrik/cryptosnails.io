@@ -40,10 +40,12 @@
   Moralis.Web3.getSigningData = () => 'Sign in to CryptoSnails.io'
 
   const PlayerPosition = Moralis.Object.extend("PlayerPosition");
+  let nft
 
   async function start() {
     const user = Moralis.User.current();
     if (user) {
+      nft = await getNFT()
       $("#logout-screen").show()
     }
     else {
@@ -95,7 +97,8 @@
   const competitors = {};
 
   async function preload () {
-      this.load.image("player", "./basic-snail.svg");
+      let playerUrl = nft ? nft : "./basic-snail.svg"
+      this.load.image("player", playerUrl);
       this.load.image("coin", "./coin.png");
       this.load.image("tiles", "./sprite.png");
   }
@@ -121,6 +124,22 @@
       await Moralis.Cloud.run("collectCoin", {x: coin.x/32, y: coin.y/32})
       text.setText(`Coins collected: ${coinScore}`); // set the text to show the current score
       return false;
+  }
+
+  async function getNFT () {
+    // Get NFTs data (Only Aavegotchis)
+    const query = new Moralis.Query("PolygonNFTOwners") || Moralis.Query("EthNFTOwners");
+    let nft = await query.equalTo("name", "Aavegotchi").first();
+    if (!nft) nft = await query.first()
+    if (!nft) return undefined
+    if (!nft.get('token_uri')) return undefined
+
+    const tokenData = await Moralis.Cloud.run("getTokenData", {tokenUri: nft.get('token_uri')});
+    const rawSVG = tokenData.data.image_data
+    const svgBlob = new Blob([rawSVG], {type:"image/svg+xml;charset=utf-8"})
+    const url = URL.createObjectURL(svgBlob)
+    console.log('url', url)
+    return url
   }
 
   async function create () {
@@ -173,8 +192,7 @@
 
     coins = this.physics.add.staticGroup()
     let coinsQuery = new Moralis.Query('Coin')
-    const coinsData = await coinsQuery.find()
-    console.log('coinsData', coinsData)
+    const coinsData = await coinsQuery.limit(1000).find()
     coinsData.map(coinData => {
       coins.create(coinData.get('x') * 32, coinData.get('y') * 32, "coin"); 
     })
