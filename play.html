@@ -133,6 +133,7 @@
   }
 
   async function getNFT () {
+    return undefined; // TODO
     // Get NFTs data (Only Aavegotchis)
     const query = new Moralis.Query("PolygonNFTOwners") || Moralis.Query("EthNFTOwners");
     let nft = await query.equalTo("name", "Aavegotchi").first();
