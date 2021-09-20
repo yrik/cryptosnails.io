@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mint CryptoSnails</title>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-moralis@0.2.3/lib/index.cjs.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+      const { useState } = React
+
+      const App = () => {
+        const [count, setCount] = useState(1)
+        const snailPrice = 0.05
+
+        let user = Moralis.User.current()
+        const auth = async () => {
+          user = await Moralis.authenticate()
+        }
+        const logout = async () => {
+          await Moralis.User.logOut();
+        }
+
+        return (
+        <div style={{margin: '20px'}}>
+        
+          <div>
+            {user ? (<button onClick={lgout}>Logout</button>) : (<button onClick={auth}>Connect Wallet</button>)}
+          </div>
+
+          <div>
+            Amount: <input 
+              type="number" 
+              min="1" 
+              max="100"
+              value={count} onChange={(e) => setCount(e.target.value)}
+            />
+            <br/>
+            Total: {(snailPrice * count).toFixed(2)} ether
+            <br/>
+            <button>Mint CryptoSnails</button>
+          </div>
+        </div>
+        )
+      }
+
+      ReactDOM.render(
+        <App></App>,
+        document.getElementById('root')
+      );
+
+    </script>
+    <!--
+      Note: this page is a great way to try React but it's not suitable for production.
+      It slowly compiles JSX with Babel in the browser and uses a large development build of React.
+
+      Read this section for a production-ready setup with JSX:
+      https://reactjs.org/docs/add-react-to-a-website.html#add-jsx-to-a-project
+
+      In a larger project, you can use an integrated toolchain that includes JSX instead:
+      https://reactjs.org/docs/create-a-new-react-app.html
+
+      You can also use React without JSX, in which case you can remove Babel:
+      https://reactjs.org/docs/react-without-jsx.html
+    -->
+  </body>
+</html>
