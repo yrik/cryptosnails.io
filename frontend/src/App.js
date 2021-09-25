@@ -2,53 +2,52 @@ import { useState, useEffect } from 'react';
 
 import { ethers } from "ethers";
 import { Helmet } from "react-helmet";
+import { useMoralis } from 'react-moralis'
 
 import './App.css';
 import { abi } from "./CryptoSnailsABI.js";
 
-const options = {
-  address: "0x37af8Ff206D7D7e85B3dED055F7B8082dAc22067",
-  abi: abi
-};
 
+function App({ isProduction }) {
 
-let provider;
-let signer;
-let contract;
+  const options = {
+    //address: "0x37af8Ff206D7D7e85B3dED055F7B8082dAc22067",  // TODO: switch depending on test/prod network
+    address: "0x7A02175D2370033AA73df96BBb45813bF9DDE771",
+    abi: abi,
+    chain: isProduction ? "polygon" : "mumbai"
+  };
 
+  const { Moralis, web3, isInitialized, authenticate, logout, isAuthenticated, user, isWeb3Enabled, enableWeb3, web3EnableError, isWeb3EnableLoading } = useMoralis()
 
-function App() {
-
-  const SNAIL_PRICE = 0.0005
-  const [amount, setAmount] = useState(1)
-  const price = amount * SNAIL_PRICE
-
-  const [userAddress, setUserAddress] = useState(undefined)
-  const [userBalance, setUserBalance] = useState(undefined)
-
+  const [snailPrice, setSnailPrice] = useState(undefined)
   const [totalSupply, setTotalSupply] = useState(undefined)
 
+  const [amount, setAmount] = useState(1)
+  const price = amount * snailPrice
+
   useEffect(()=>{
-    async function init() {
-      provider = new ethers.providers.Web3Provider(window.ethereum)
-      await provider.send("eth_requestAccounts", []);
+    async function init() {      
 
-      signer = provider.getSigner()
-      contract = new ethers.Contract(options.address, options.abi, signer);
+      if (isInitialized) {
+        const totalSupply = await Moralis.Web3API.native.runContractFunction({function_name: "totalSupply", ...options})
+        setTotalSupply(totalSupply)
 
-      const totalSupply = await contract.totalSupply()
-      console.log(totalSupply)
-      setTotalSupply(totalSupply.toNumber())
-
-      const address = await signer.getAddress() 
-      setUserAddress(address)
-
-      const balance = await signer.getBalance()
-      setUserBalance(balance)
+        const snailPrice = await Moralis.Web3API.native.runContractFunction({function_name: "snailPrice", ...options})
+        setSnailPrice(ethers.utils.parseUnits(snailPrice, "wei"))
+      }
     }
     init()
-  }, [])
+  }, [isInitialized])
 
+  async function mintSnail() {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      const contract = new ethers.Contract(options.address, options.abi, signer);
+
+      const tx = await contract.buy(amount, {value: price})
+      const receipt = await tx.wait()
+      console.log(receipt)
+  }
 
   return (
     <>
@@ -62,26 +61,19 @@ function App() {
           <div className="m-10">
 
             <div className="mb-10">
-            <span className="text-xl">User</span> 
-            <br/>
-            address: {userAddress}<br/>
-            balance: {userBalance ? ethers.utils.formatEther(userBalance):null}
+              <div>Mode: {isProduction ? "Polygon Mainnet" : "Polygon Testnet"}</div>
+              { isAuthenticated ? (<button onClick={() => logout()}>Logout</button>) : (<button onClick={async () => {await enableWeb3(); await authenticate({signingMessage: "CryptoSnails Auth"})}}>Connect Wallet</button>)}
             </div>
 
             <h1 className="text-xl">Mint CryptoSnails</h1>
             <br/>
             <span>Available: {10000 - totalSupply} out of 10000</span>
             <br/>
-            <span>price: {price} eth</span>
+            <span>price: {price && ethers.utils.formatEther(price)} eth</span>
             <br/>
             <input className="outline-black mr-5" type="number" min="1" max="100" value={amount} onChange={(e) => setAmount(e.target.value)} />
             <button 
-              onClick={async () => {
-                console.log(contract)
-                const tx = await contract.buy(amount, {value: ethers.utils.parseEther('' + price)})
-                const receipt = await tx.wait()
-                console.log(receipt)
-              }} 
+              onClick={mintSnail} 
               className="bg-blue-500 hover:bg-blue-700 text-white text-center py-2 px-4 rounded"
             >Mint</button>
           </div>
