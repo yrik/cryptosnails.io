@@ -6,6 +6,7 @@ import { useMoralis } from 'react-moralis'
 
 import './App.css';
 import { abi } from "./CryptoSnailsABI.js";
+import { MemoizedGame, Game } from './Game.js'
 
 
 function App({ isProduction }) {
@@ -79,6 +80,11 @@ function App({ isProduction }) {
           </div>
         </div>
       </div>
+
+          <div>
+          { isInitialized ? <MemoizedGame Moralis={Moralis}/> : null}
+          </div>
+
     </>
   )
 
