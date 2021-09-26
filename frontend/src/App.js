@@ -6,7 +6,51 @@ import { useMoralis } from 'react-moralis'
 
 import './App.css';
 import { abi } from "./CryptoSnailsABI.js";
-import { MemoizedGame, Game } from './Game.js'
+import { MemoizedGame, Game, Leaderboard } from './Game.js'
+
+
+function Roadmap() {
+
+  return (
+    <div className="text-center mt-10">
+      <h3 className="text-xl pb-5">Roadmap</h3>
+      <div>
+        <table className="border-collapse border table-auto text-left">
+          <tr>
+            <td className="border p-5">Game prototype</td>
+            <td className="border p-5">September 2021</td>
+            <td className="border p-5 text-right">✅</td>
+          </tr>
+          <tr>
+            <td className="border p-5">NFT collection draft</td>
+            <td className="border p-5">September 2021</td>
+            <td className="border p-5 text-right">✅</td>
+          </tr>
+          <tr>
+            <td className="border p-5">NFT collection release</td>
+            <td className="border p-5">October 2021</td>
+            <td className="border p-5 text-right">pending</td>
+          </tr>
+          <tr>
+            <td className="border p-5">Game release</td>
+            <td className="border p-5">October 2021</td>
+            <td className="border p-5 text-right">pending</td>
+          </tr>
+          <tr>
+            <td className="border p-5">NFT staking</td>
+            <td className="border p-5">November 2021</td>
+            <td className="border p-5 text-right">pending</td>
+          </tr>
+          <tr>
+            <td className="border p-5">Liqudity Pool staking</td>
+            <td className="border p-5">November 2021</td>
+            <td className="border p-5 text-right">pending</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  )
+}
 
 
 function App({ isProduction }) {
@@ -98,9 +142,17 @@ function App({ isProduction }) {
         </div>
       </div>
 
-          <div>
-          { isInitialized ? <MemoizedGame Moralis={Moralis}/> : null}
-          </div>
+      <div>
+      { isInitialized ? <MemoizedGame Moralis={Moralis}/> : null}
+      </div>
+
+      <div>
+      { isInitialized ? <Leaderboard Moralis={Moralis}/> : null}
+      </div>
+
+      <div className="flex justify-center">
+        <Roadmap />
+      </div>
 
     </>
   )
