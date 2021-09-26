@@ -57,15 +57,32 @@ function App({ isProduction }) {
           <title>Crypto Snails - Earn $snail crypto by playing the game</title>
       </Helmet>
 
-      <div className="pt-20 flex justify-center">
+      <div className="flex justify-end">
+        <div className="flex px-5 py-5">
+          <select value={isProduction ? "polygon" : "mumbai"}>
+            <option value="polygon">Polygon Mainnet</option>
+            <option value="mumbai">Polygon Testnet</option>
+          </select>
+        </div>
+        <div className="flex px-5 py-5 mr-5">
+        { isAuthenticated ? (
+          <button className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" onClick={() => logout()}>Logout</button>
+        ) : (
+          <button className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" onClick={async () => {await enableWeb3(); await authenticate({signingMessage: "CryptoSnails Auth"})}}>Connect Wallet</button>
+        )}
+        </div>
+      </div>
+
+      <div>
+        <h1 className="text-3xl text-center">Earn $snail crypto by playing the game</h1>
+        <div className="flex justify-center">
+          <h4 className="max-w-xl mt-1 text-center">Every day coins are thrown on the table. Collect them with a snail. In future snails can be staked to collect coins automatically.</h4>
+        </div>
+      </div>
+
+      <div className="pt-5 flex justify-center">
         <div className="flex w-300">
           <div className="m-10">
-
-            <div className="mb-10">
-              <div>Mode: {isProduction ? "Polygon Mainnet" : "Polygon Testnet"}</div>
-              { isAuthenticated ? (<button onClick={() => logout()}>Logout</button>) : (<button onClick={async () => {await enableWeb3(); await authenticate({signingMessage: "CryptoSnails Auth"})}}>Connect Wallet</button>)}
-            </div>
-
             <h1 className="text-xl">Mint CryptoSnails</h1>
             <br/>
             <span>Available: {10000 - totalSupply} out of 10000</span>

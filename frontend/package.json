@@ -1,5 +1,6 @@
 {
   "name": "frontend",
+  "homepage": "https://cryptosnails.io",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -9,8 +10,8 @@
     "@testing-library/user-event": "^12.1.10",
     "autoprefixer": "^9",
     "ethers": "^5.4.7",
+    "gh-pages": "^3.2.3",
     "moralis": "^0.0.55",
-    "phaser-react-tools": "^1.0.4",
     "postcss": "^7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
