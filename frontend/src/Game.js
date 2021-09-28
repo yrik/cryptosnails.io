@@ -113,7 +113,7 @@ export function Game({ Moralis }) {
     let coinsQuery = new Moralis.Query('Coin')
     const coinsData = await coinsQuery.limit(1000).find()
     coinsData.map(coinData => {
-      console.log('coins', coins)
+      //console.log('coins', coins)
       coins.create(coinData.get('x') * 32, coinData.get('y') * 32, "coin"); 
     })
 

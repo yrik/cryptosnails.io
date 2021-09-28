@@ -51,7 +51,6 @@ function App({ isProduction }) {
 
   useEffect(()=>{
     async function init() {      
-
       if (isInitialized) {
         const totalSupply = await Moralis.Web3API.native.runContractFunction({function_name: "totalSupply", ...options})
         setTotalSupply(totalSupply)
@@ -66,11 +65,27 @@ function App({ isProduction }) {
   useEffect(()=>{
     async function init() {      
       if (isInitialized & isAuthenticated) {
+        await switchNetwork()
         await fetchNFTs()
       }
     }
     init()
   }, [isInitialized, isAuthenticated])
+
+  useEffect(()=>{
+    async function init() {      
+      try {
+        window.ethereum.on('chainChanged', () => {
+          document.location.reload()
+        })
+
+        window.ethereum.on('accountsChanged', () => {
+          document.location.reload()
+        })
+      } catch(err) {console.log(err)}
+    }
+    init()
+  }, [])
 
 
   async function mintSnail() {
@@ -112,8 +127,24 @@ function App({ isProduction }) {
     setOverlay(false)
   }
 
+  async function switchNetwork() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    console.log('provider', provider)
+    const { chainId } = await provider.getNetwork()
+    console.log('chainId', chainId)
+    // Try to switch to polygon if not on polygon or polygon testnet
+    if (chainId !== 137 && chainId != 80001) {
+      try {
+        await provider.send("wallet_switchEthereumChain", [{ chainId: "0x89" }])
+      } catch (error) {
+        alert("Please switch to POLYGON network")
+      }
+    }
+  }
+
   async function login() {
     await enableWeb3()
+    await switchNetwork()
     await authenticate({signingMessage: "CryptoSnails Auth"})
   }
 
@@ -218,7 +249,7 @@ function App({ isProduction }) {
               <div className="text-sm text-gray-600">$Snail Tokens: N/A</div>
               <div className="text-sm text-gray-600">Snail NFTs: {user ? nfts.length : 'N/A'}</div>
               <div>
-                {nfts.map(nft => (<div key={nft.token_id} className="bg-blue-200 inline-block mr-1 border-gray-50 rounded-md border w-12 h-12"></div>))}
+                {nfts.map(nft => (<div key={nft} className="bg-blue-200 inline-block mr-1 border-gray-50 rounded-md border w-12 h-12"></div>))}
               </div>
             </div>
           </div>
