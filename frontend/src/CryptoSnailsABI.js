@@ -119,7 +119,7 @@ export const abi = [
 				"type": "uint256"
 			}
 		],
-		"name": "buy",
+		"name": "mint",
 		"outputs": [],
 		"stateMutability": "payable",
 		"type": "function"

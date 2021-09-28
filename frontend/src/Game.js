@@ -20,7 +20,7 @@ export function Game({ Moralis }) {
       scale: {
           mode: Phaser.Scale.FIT,
           autoCenter: Phaser.Scale.CENTER_BOTH,
-          width: 800,
+          width: 900,
           height: 600
       },
        physics: {
@@ -247,12 +247,19 @@ export function Game({ Moralis }) {
   }
 
   async function claimCoins() {
-    alert("Moving coins to your account..")
-      await Moralis.Cloud.run("claimCoins")
-      coinScore = 0;
-      user.set('coinScore', 0) 
-      await user.save()
-      text.setText(`Coins collected: ${coinScore}`); // set the text to show the current score
+    
+    // TODO: check if user own NFT
+
+      if (user) {
+        alert("Moving coins to your account..")
+        await Moralis.Cloud.run("claimCoins")
+        coinScore = 0;
+        user.set('coinScore', 0) 
+        await user.save()
+        text.setText(`Coins collected: ${coinScore}`); // set the text to show the current score
+      } else {
+        alert("Please mint a SNAIL to claim coins")
+      }
   }
 
   async function collectCoin(player, coin) {

@@ -17,8 +17,8 @@ contract CryptoSnails is ERC721Enumerable, Ownable {
 
     Counters.Counter private _Ids;
 
-    uint256 private MAX_SNAILS = 10000;
-    uint256 snailPrice = 0.05 ether;
+    uint256 public MAX_SNAILS = 10000;
+    uint256 public snailPrice = 0.0005 ether;
 
     string private baseURI = "https://api.cryptosnails.io/token/";
     
@@ -54,7 +54,7 @@ contract CryptoSnails is ERC721Enumerable, Ownable {
         }
     }
 
-    function buy(uint256 snailsAmount) external payable {
+    function mint(uint256 snailsAmount) external payable {
         require(saleActive == true, "Sales are currently closed");
         require(totalSupply() < MAX_SNAILS, "Sold Out");
         require(snailsAmount > 0, "snailsAmount cannot be 0");
