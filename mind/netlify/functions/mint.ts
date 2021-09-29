@@ -6,11 +6,11 @@ require("dotenv").config()
 const NODE_URL_POLYGON = "https://speedy-nodes-nyc.moralis.io/3e99daa93f8cf1e5719e36e3/polygon/mainnet"
 
 const handler = async (event, context) => {
-  const apiKey =  event.queryStringParameters.api_key
+  const apiKey =  event.queryStringParameters.apiKey
   if (!apiKey || apiKey !== process.env.API_KEY) {
     return {
       statusCode: 401,
-      body: JSON.stringify({ message: 'wrong api key'}),
+      body: JSON.stringify({ message: `wrong api key ${apiKey}`}),
     };
   }
 
