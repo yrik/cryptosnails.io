@@ -20,8 +20,8 @@ export function Game({ Moralis }) {
       scale: {
           mode: Phaser.Scale.FIT,
           autoCenter: Phaser.Scale.CENTER_BOTH,
-          width: 900,
-          height: 600
+          width: window.innerWidth,
+          height: window.innerHeight,
       },
        physics: {
           default: 'arcade',

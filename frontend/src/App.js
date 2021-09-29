@@ -156,44 +156,26 @@ function App({ isProduction }) {
           <meta name="description" value="Every day coins are thrown on the table. Collect them with a snail." />
       </Helmet>
 
-      <div className="flex justify-around bg-purple">
-        <div className="flex p-5 py-4">
-          <img src="/images/logo.png" style={{width: "178px", height: "32px"}}/>
-        </div>
-
-        <div className="w-70 py-6 text-sm text-gray-50">
-          Available: {10000 - totalSupply} out of 10000 NFT Snails
-        </div>
-
-        <div className="flex px-5 py-4 mr-5">
-        { isAuthenticated ? (
-          <button className="bg-yellow-300 px-4 rounded-md bg-yellow" onClick={async () => {await logout(); setNFTs([]); setOverlay(true)}}>Logout</button>
-        ) : (
-          <button className="px-4 rounded-md bg-yellow" onClick={async () => {await login()}}>Connect Wallet</button>
-        )}
-        </div>
-      </div>
-
-      <div>
-        <h1 className="mt-5 text-3xl text-center uppercase text-green font-bold">Earn $snail crypto by playing the game</h1>
-        <div className="flex justify-center">
-          <h4 className="max-w-x2l mt-1 text-center text-gray-500">Every day coins are thrown on the table. Collect them with a snail. In future snails can be staked to collect coins automatically.</h4>
-        </div>
-      </div>
-
-
-      <div className="grid grid-cols-8 gap-1 p-5 m-auto" style={{maxWidth: "1150px"}}>
-
-        <div className="col-span-6 relative" >
           <div>
             { isInitialized ? <MemoizedGame Moralis={Moralis}/> : null}
 
             { overlay ? (
             <div className="bg-purple bg-opacity-50 flex" style={{position: "absolute", top: "0px", width: "100%", height: "100%"}}>
-              <div className="m-auto h-60 w-full bg-ping-200 flex justify-center">
+
+              
+              {/*
+              <div className="m-auto h-30 w-30 bg-gray-50">
+                <h1 className="mt-5 text-3xl text-center uppercase text-green font-bold">Earn $snail crypto by playing the game</h1>
+                <div className="flex justify-center">
+                  <h4 className="max-w-x2l mt-1 text-center text-gray-500">Every day coins are thrown on the table. Collect them with a snail.</h4>
+                </div>
+              </div>
+              */}
+
+              <div className="m-auto w-auto flex justify-center">
 
                 { nfts.length === 0 ? (
-                <div className="w-48 h-60 text-center">
+                <div className="w-60 h-90 p-5 text-center bg-gray-500">
                   <div className="w-full h-40 border-gray-50 rounded-md border">
                   </div>
                   <div className="text-white font-bold uppercase text-sm">speed: mormal</div> 
@@ -201,9 +183,9 @@ function App({ isProduction }) {
                 </div>
                 ) : 
                   (
-                 <div className="w-48 h-60 text-center">
+                <div className="w-60 h-90 p-5 text-center bg-gray-500">
                   <div className="w-full h-40 border-gray-50 rounded-md border">
-                    {activeNFT}
+                    <small>{activeNFT}</small>
                   </div>
                   <div className="text-white font-bold uppercase text-sm">speed: mormal</div> 
                   <button className="px-8 py-2 rounded-md bg-green m-2 uppercase text-sm" onClick={async () => {play()}}>Play</button>
@@ -212,7 +194,7 @@ function App({ isProduction }) {
                
                 }
 
-                <div className="ml-5 w-48 h-60 text-center">
+                <div className="ml-5 w-60 h-90 p-5 text-center bg-gray-500">
                   <div className="w-full h-40 border-gray-50 rounded-md border">
                   </div>
                   <div className="text-white font-bold uppercase text-sm">speed: normal / VIP </div> 
@@ -232,37 +214,6 @@ function App({ isProduction }) {
             ): null}
 
           </div>
-
-          {/*
-          <br/>
-          { isInitialized ? <Leaderboard Moralis={Moralis}/> : null}
-          */}
-        </div>
-
-        <div className="col-span-2">
-          <div className="mx-6">
-            <div className="w-full h-40 bg-blue-200 border-gray-200 rounded-md border">
-            </div>
-            
-            <div>
-              <div className="py-2 font-bold text-sm text-gray-600">My Profile</div>
-              <div className="text-sm text-gray-600">$Snail Tokens: N/A</div>
-              <div className="text-sm text-gray-600">Snail NFTs: {user ? nfts.length : 'N/A'}</div>
-              <div>
-                {nfts.map(nft => (<div key={nft} className="bg-blue-200 inline-block mr-1 border-gray-50 rounded-md border w-12 h-12"></div>))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      {/*
-      <div className="flex justify-center">
-        <Roadmap />
-      </div>
-      */}
-
     </>
   )
 
