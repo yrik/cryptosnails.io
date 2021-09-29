@@ -6,6 +6,13 @@ require("dotenv").config()
 const NODE_URL_POLYGON = "https://speedy-nodes-nyc.moralis.io/3e99daa93f8cf1e5719e36e3/polygon/mainnet"
 
 const handler = async (event, context) => {
+  const apiKey =  ethers.utils.parseUnits(event.queryStringParameters.api_key)
+  if (apiKey !== process.env.API_KEY) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ }),
+    };
+  }
 
   const address = "0x6B79D10a8eFA54dFca5a99705D3c97acA80b79E9"
   const NODE_URL_MUMBAI = "https://speedy-nodes-nyc.moralis.io/3e99daa93f8cf1e5719e36e3/polygon/mumbai"

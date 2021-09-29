@@ -1,4 +1,5 @@
 {
+  "name": "cryptosnails-netlify",
   "dependencies": {
     "@netlify/functions": "^0.7.2",
     "dotenv": "^10.0.0",
