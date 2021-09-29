@@ -20,6 +20,7 @@ const handler = async (event, context) => {
   const provider = new ethers.providers.JsonRpcProvider(NODE_URL_MUMBAI);
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider)
   let contract = new ethers.Contract(address, abi, wallet)
+  //contract = contract.connect(wallet)
 
   const amount =  ethers.utils.parseUnits(event.queryStringParameters.amount)
   const receiver = ethers.utils.getAddress(event.queryStringParameters.receiver)

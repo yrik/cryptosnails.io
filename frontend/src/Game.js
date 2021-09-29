@@ -254,6 +254,9 @@ export function Game({ Moralis }) {
       if (user) {
         alert("Moving coins to your account..")
         await Moralis.Cloud.run("claimCoins")
+        coinScore = 0;
+        user.set('coinScore', 0) 
+        await user.save()
         text.setText(`Coins collected: ${coinScore}`); // set the text to show the current score
       } else {
         alert("Please mint a SNAIL to claim coins")
