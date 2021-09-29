@@ -56,7 +56,8 @@ export function Game({ Moralis }) {
   const competitors = {};
 
   async function preload () {
-      let playerUrl = nft ? nft : "/images/basic-snail.svg"
+      //let playerUrl = nft ? nft : "/images/basic-snail.svg"
+      let playerUrl = "/images/snail.png"
       this.load.image("player", playerUrl);
       this.load.image("coin", "/images/coin.png");
       this.load.image("tiles", "/images/sprite.png");
@@ -138,7 +139,7 @@ export function Game({ Moralis }) {
         lastY = lastPosition.get('y')
       }
 
-      player = this.physics.add.image(lastX, lastY, 'player').setScale(0.25).refreshBody();
+      player = this.physics.add.image(lastX, lastY, 'player').refreshBody();
 
       this.physics.add.overlap(player, coins, collectCoin, null, this);
       this.physics.add.collider(player, wallsLayer);
@@ -210,12 +211,12 @@ export function Game({ Moralis }) {
       if (cursors.left.isDown)
       {
           player.setVelocityX(-160);
-          player.setFlip(false, false)
+          player.setFlip(true, false)
       }
       else if (cursors.right.isDown)
       {
           player.setVelocityX(160);
-          player.setFlip(true, false)
+          player.setFlip(false, false)
       }
       else if (cursors.down.isDown)
       {

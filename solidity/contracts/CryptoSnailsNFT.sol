@@ -54,6 +54,10 @@ contract CryptoSnails is ERC721Enumerable, Ownable {
         }
     }
 
+    function withdrawTokens() external onlyOwner {  
+        ERC20 (tokenContractAddress).transfer(_owner, ERC20 (tokenContractAddress).balanceOf(address(this)));
+    }
+
     function mint(uint256 snailsAmount) external payable {
         require(saleActive == true, "Sales are currently closed");
         require(totalSupply() < MAX_SNAILS, "Sold Out");
