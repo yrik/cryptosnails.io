@@ -60,7 +60,7 @@ export function Game({ Moralis }) {
       let playerUrl = "/images/snail.png"
       this.load.image("player", playerUrl);
       this.load.image("coin", "/images/coin.png");
-      this.load.image("tiles", "/images/sprite.png");
+      this.load.image("tiles", "/images/sprite-fix.png");
   }
 
 
@@ -72,18 +72,20 @@ export function Game({ Moralis }) {
     const size = level.get('size')
     const indexes = [...Array(size).keys()]
 
+    const tilemapConf = {tileWidth: 32, tileHeight: 32}
+
     const backgroundTileMap = this.make.tilemap({ 
       data: indexes.map( _ => indexes.map( _ => 4)), 
-      tileWidth: 32, tileHeight: 32, tileMargin: 0, tileSpacing: 0, 
+      ...tilemapConf
     })
-    const backgroundTileSet = backgroundTileMap.addTilesetImage("tiles")
+    const backgroundTileSet = backgroundTileMap.addTilesetImage("tiles", null, 32, 32, 1, 2)
     const backgroundLayer = backgroundTileMap.createLayer(0, backgroundTileSet, 0, 0); // layer index, tileset, x, y
 
     const wallsTileMap = this.make.tilemap({ 
       data: level.get('data'),
-      tileWidth: 32, tileHeight: 32, tileMargin: 0, tileSpacing: 0, 
+      ...tilemapConf
     })
-    const wallsTileSet = wallsTileMap.addTilesetImage("tiles")
+    const wallsTileSet = wallsTileMap.addTilesetImage("tiles", null, 32, 32, 1, 2)
     const wallsLayer = wallsTileMap.createLayer(0, wallsTileSet, 0, 0); // layer index, tileset, x, y
     wallsLayer.setCollisionBetween(1, 50);
 
@@ -92,9 +94,9 @@ export function Game({ Moralis }) {
       data: indexes.map( row => indexes.map( col => {
        if(row == 0 || row == size-1 || col == 0 || col == size-1) return 3 
       })), 
-      tileWidth: 32, tileHeight: 32, tileMargin: 0, tileSpacing: 0, 
+      ...tilemapConf
     })
-    const edgeTileSet = edgeTileMap.addTilesetImage("tiles")
+    const edgeTileSet = edgeTileMap.addTilesetImage("tiles", null, 32, 32, 1, 2)
     const edgeLayer = edgeTileMap.createLayer(0, edgeTileSet, 0, 0); // layer index, tileset, x, y
     edgeLayer.setCollisionBetween(1, 50);
 
