@@ -2,10 +2,10 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useMoralis } from 'react-moralis'
 import Phaser from 'phaser'
 import { IonPhaser } from '@ion-phaser/react'
-//import { GameComponent } from 'phaser-react-tools'
+import { blobToURL, fromURL } from 'image-resize-compress';
 
 
-export function Game({ Moralis }) {
+export function Game({ Moralis, activeNFT }) {
   const gameRef = useRef(null)
   const PlayerPosition = Moralis.Object.extend("PlayerPosition");
 
@@ -56,8 +56,8 @@ export function Game({ Moralis }) {
   const competitors = {};
 
   async function preload () {
-      //let playerUrl = nft ? nft : "/images/basic-snail.svg"
-      let playerUrl = "/images/snail.png"
+      let playerUrl = (activeNFT && activeNFT['image-preview']) ? activeNFT['image-preview']: "/images/demo-preview.png"
+    
       this.load.image("player", playerUrl);
       this.load.image("coin", "/images/coin.png");
       this.load.image("tiles", "/images/sprite-fix.png");

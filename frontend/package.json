@@ -12,6 +12,7 @@
     "autoprefixer": "^9",
     "ethers": "^5.4.7",
     "gh-pages": "^3.2.3",
+    "image-resize-compress": "^1.0.8",
     "moralis": "^0.0.55",
     "phaser": "^3.55.2",
     "postcss": "^7",

@@ -25,6 +25,7 @@ function App({ isProduction }) {
 
   const [overlay, setOverlay] = useState(true)
   const [isMinting, setMinting] = useState(false)
+  const [isNFTFetched, setNFTFetched] = useState(false)
 
   const [snailPrice, setSnailPrice] = useState(undefined)
   const [totalSupply, setTotalSupply] = useState(undefined)
@@ -36,17 +37,23 @@ function App({ isProduction }) {
   const price = snailPrice && amount ? snailPrice.mul(amount) : undefined
 
   async function fetchNFTs() {
-    if (isAuthenticated) {
+      setNFTFetched(false)
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       const signer = provider.getSigner()
       const contract = new ethers.Contract(options.address, options.abi, signer);
-      const nfts = await contract.tokensOfOwner(signer.getAddress())
-      console.log('nfts', nfts)
+      let nfts = await contract.tokensOfOwner(signer.getAddress())
+      nfts = await Promise.all(nfts.map(async (url) => {
+        let resp = await fetch(url.replace('ipfs://', 'https://ipfs.io/ipfs/'))
+        let nft = await resp.json()
+        nft.image = nft.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
+        nft['image-preview'] = nft['image-preview'].replace('ipfs://', 'https://ipfs.io/ipfs/')
+        return nft
+      }))
       setNFTs(nfts)
       if (nfts.length > 0) {
         setActiveNFT(nfts[0])
       }
-    }
+      setNFTFetched(true)
   }
 
   useEffect(()=>{
@@ -64,7 +71,7 @@ function App({ isProduction }) {
 
   useEffect(()=>{
     async function init() {      
-      if (isInitialized & isAuthenticated) {
+      if (isInitialized && isAuthenticated) {
         await switchNetwork()
         await fetchNFTs()
       }
@@ -157,7 +164,7 @@ function App({ isProduction }) {
       </Helmet>
 
           <div>
-            { isInitialized ? <MemoizedGame Moralis={Moralis}/> : null}
+            { isInitialized ? <MemoizedGame activeNFT={activeNFT} Moralis={Moralis}/> : null}
 
             { overlay ? (
             <div className="bg-purple bg-opacity-50 flex" style={{position: "absolute", top: "0px", width: "100%", height: "100%"}}>
@@ -177,6 +184,7 @@ function App({ isProduction }) {
                 { nfts.length === 0 ? (
                 <div className="w-60 h-90 p-5 text-center bg-gray-500">
                   <div className="w-full h-40 border-gray-50 rounded-md border">
+                    <img className="max-h-full max-w-full mx-auto" src="/images/demo.png" />
                   </div>
                   <div className="text-white font-bold uppercase text-sm">speed: mormal</div> 
                   <button className="px-8 py-2 rounded-md bg-yellow m-2 uppercase text-sm" onClick={async () => {await playDemo()}}>DEMO Play</button>
@@ -185,7 +193,7 @@ function App({ isProduction }) {
                   (
                 <div className="w-60 h-90 p-5 text-center bg-gray-500">
                   <div className="w-full h-40 border-gray-50 rounded-md border">
-                    <small>{activeNFT}</small>
+                    <img className="max-h-full max-w-full mx-auto" src={activeNFT.image} />
                   </div>
                   <div className="text-white font-bold uppercase text-sm">speed: mormal</div> 
                   <button className="px-8 py-2 rounded-md bg-green m-2 uppercase text-sm" onClick={async () => {play()}}>Play</button>
