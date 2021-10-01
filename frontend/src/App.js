@@ -25,7 +25,7 @@ function App({ isProduction }) {
 
   const [overlay, setOverlay] = useState(true)
   const [isMinting, setMinting] = useState(false)
-  const [isNFTFetched, setNFTFetched] = useState(false)
+  const [ready, setReady] = useState(false)
 
   const [snailPrice, setSnailPrice] = useState(undefined)
   const [totalSupply, setTotalSupply] = useState(undefined)
@@ -37,7 +37,6 @@ function App({ isProduction }) {
   const price = snailPrice && amount ? snailPrice.mul(amount) : undefined
 
   async function fetchNFTs() {
-      setNFTFetched(false)
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       const signer = provider.getSigner()
       const contract = new ethers.Contract(options.address, options.abi, signer);
@@ -53,7 +52,6 @@ function App({ isProduction }) {
       if (nfts.length > 0) {
         setActiveNFT(nfts[0])
       }
-      setNFTFetched(true)
   }
 
   useEffect(()=>{
@@ -71,9 +69,14 @@ function App({ isProduction }) {
 
   useEffect(()=>{
     async function init() {      
-      if (isInitialized && isAuthenticated) {
-        await switchNetwork()
-        await fetchNFTs()
+      if (isInitialized) {
+        if (isAuthenticated) {
+          await switchNetwork()
+          await fetchNFTs()
+          setReady(true)
+        } else {
+          setReady(true)
+        }
       }
     }
     init()
@@ -111,6 +114,7 @@ function App({ isProduction }) {
         const receipt = await tx.wait()
         console.log(receipt)
         await fetchNFTs()
+        document.location.reload()
         setOverlay(false)
       } catch(err) {
         setMinting(false)
@@ -164,7 +168,7 @@ function App({ isProduction }) {
       </Helmet>
 
           <div>
-            { isInitialized ? <MemoizedGame activeNFT={activeNFT} Moralis={Moralis}/> : null}
+            { ready ? <MemoizedGame activeNFT={activeNFT} Moralis={Moralis}/> : null}
 
             { overlay ? (
             <div className="bg-purple bg-opacity-50 flex" style={{position: "absolute", top: "0px", width: "100%", height: "100%"}}>
