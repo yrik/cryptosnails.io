@@ -199,7 +199,7 @@ function App({ isProduction }) {
                   <div className="w-full h-40 border-gray-50 rounded-md border">
                     <img className="max-h-full max-w-full mx-auto" src={activeNFT.image} />
                   </div>
-                  <div className="text-white font-bold uppercase text-sm">speed: mormal</div> 
+                  <div className="text-white font-bold uppercase text-sm">speed: Demo</div> 
                   <button className="px-8 py-2 rounded-md bg-green m-2 uppercase text-sm" onClick={async () => {play()}}>Play</button>
                 </div>
                   )
@@ -208,6 +208,7 @@ function App({ isProduction }) {
 
                 <div className="ml-5 w-60 h-90 p-5 text-center bg-gray-500">
                   <div className="w-full h-40 border-gray-50 rounded-md border">
+                    <img className="max-h-full max-w-full mx-auto" src="/images/snail.gif" />
                   </div>
                   <div className="text-white font-bold uppercase text-sm">speed: normal / VIP </div> 
                   <button disabled={isMinting} className="px-8 py-2 rounded-md m-2 bg-red text-white uppercase text-sm" onClick={async () => {mintSnail()}}>{isMinting ? "Processing.." : "Mint & Play"}</button>
