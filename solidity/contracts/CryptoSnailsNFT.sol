@@ -20,7 +20,7 @@ contract CryptoSnails is ERC721Enumerable, Ownable {
     uint256 public MAX_SNAILS = 10000;
     uint256 public snailPrice = 50 ether;  // 50 matic
 
-    string private baseURI = "ipfs://QmUmE5P3B7PHcLn688TYeasTCaijxyuFXsZ2PkLvE93tpr";
+    string private baseURI = "ipfs://QmUmE5P3B7PHcLn688TYeasTCaijxyuFXsZ2PkLvE93tpr/";
     
     bool public saleActive = false;
 
