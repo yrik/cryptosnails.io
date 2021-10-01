@@ -6,7 +6,6 @@ import { blobToURL, fromURL } from 'image-resize-compress';
 
 
 export function Game({ Moralis, activeNFT }) {
-  const gameRef = useRef(null)
   const PlayerPosition = Moralis.Object.extend("PlayerPosition");
 
   const [game, setGame] = useState()
@@ -16,10 +15,7 @@ export function Game({ Moralis, activeNFT }) {
 
   const config = {
       type: Phaser.AUTO,
-      //parent: 'phaser',
       scale: {
-          mode: Phaser.Scale.FIT,
-          autoCenter: Phaser.Scale.CENTER_BOTH,
           width: window.innerWidth,
           height: window.innerHeight,
       },
@@ -40,10 +36,6 @@ export function Game({ Moralis, activeNFT }) {
     async function init() {      
         let user = Moralis.User.current();
         setUser(user)
-        if (user) {
-          nft = await getNFT()
-        }
-        //setGame(Object.assign({}, config))
     }
     init()
   })
@@ -122,7 +114,7 @@ export function Game({ Moralis, activeNFT }) {
 
     let coinsSubscription = await coinsQuery.subscribe();
     coinsSubscription.on('create', (coinData) => {
-      console.log('created', coinData)
+      //console.log('created', coinData)
       coins.create(coinData.get('x') * 32, coinData.get('y') * 32, "coin"); 
       coins.refresh()
     });
@@ -278,54 +270,8 @@ export function Game({ Moralis, activeNFT }) {
       return false;
   }
 
-  async function getNFT () {
-    return undefined; // TODO
-    // Get NFTs data (Only Aavegotchis)
-    const query = new Moralis.Query("PolygonNFTOwners") || Moralis.Query("EthNFTOwners");
-    let nft = await query.equalTo("name", "Aavegotchi").first();
-    if (!nft) nft = await query.first()
-    if (!nft) return undefined
-    if (!nft.get('token_uri')) return undefined
-
-    const tokenData = await Moralis.Cloud.run("getTokenData", {tokenUri: nft.get('token_uri')});
-    const rawSVG = tokenData.data.image_data
-    const svgBlob = new Blob([rawSVG], {type:"image/svg+xml;charset=utf-8"})
-    const url = URL.createObjectURL(svgBlob)
-    console.log('url', url)
-    return url
-  }
-
-  console.log('IonPhaser')
-
-  console.log('IonPhaser INIT')
-  //return <GameComponent config={config} />
-
-  return (<IonPhaser ref={gameRef} game={config} />)
-}
-
-
-export function Leaderboard({ Moralis }) {
-
-  const [users, setUsers] = useState([])
-
-  useEffect(()=>{
-    async function init() {      
-      const query = new Moralis.Query("User");
-      let users = await query.descending().limit(10).find();
-      setUsers(users)
-    }
-    init()
-  })
-
-  return (
-    <div className="text-center mt-5">
-      <h3>Leaderboard</h3>
-      <div>
-        {users.map(user => <div>Player {user.get('ethAddress')} has collected {user.get('coinScore')} $Snail Tokens</div>)}
-      </div>
-    </div>
-  )
-
+  console.log('CALLING IonPhaser')
+  return (<IonPhaser game={config} initialize={true}/>)
 }
 
 export const MemoizedGame = React.memo(Game)

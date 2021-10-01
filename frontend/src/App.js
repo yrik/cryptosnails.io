@@ -6,7 +6,7 @@ import { useMoralis } from 'react-moralis'
 
 import './App.css';
 import { abi } from "./CryptoSnailsABI.js";
-import { MemoizedGame, Game, Leaderboard } from './Game.js'
+import { MemoizedGame, Game } from './Game.js'
 
 
 function App({ isProduction }) {
