@@ -111,7 +111,7 @@ function App({ isProduction }) {
         if (err & err.name) {
           alert(err.name + ': ' + err.message + '. ' + err.data ? err.data.message : '')
         } else {
-          alert(err)
+          alert(JSON.stringify(err))
         }
       }
   }
