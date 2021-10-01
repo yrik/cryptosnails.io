@@ -11,7 +11,7 @@ const moralisConfig = {
   production: {appId: "JBfxbweoLK5be7xnZineX05Z3MRAPBoIohXvvqgX", serverUrl: "https://vqntw2bxdpp2.bigmoralis.com:2053/server"},
 }
 
-let isProduction = false;
+let isProduction = true;
 
 ReactDOM.render(
   <MoralisProvider {...(isProduction ? moralisConfig.production : moralisConfig.test)}>

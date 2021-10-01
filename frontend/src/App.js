@@ -12,7 +12,7 @@ import { MemoizedGame, Game } from './Game.js'
 function App({ isProduction }) {
 
   const chain = isProduction ? "polygon" : "mumbai"
-  const NFT_ADDRESS = "0xD725dcd6E4a37d992Eb76d859168ACb30Fdcd59f"
+  const NFT_ADDRESS = "0x6ECeF752D1e76c7d071E828cFC67Ec8635e149E0"
   const NFT_SYNBOL = "SNAIL"
 
   const options = {

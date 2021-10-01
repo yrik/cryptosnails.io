@@ -265,7 +265,11 @@ export function Game({ Moralis, activeNFT }) {
       user.set('coinScore', coinScore) 
       await user.save()
 
-      await Moralis.Cloud.run("collectCoin", {x: coin.x/32, y: coin.y/32})
+      try{
+        await Moralis.Cloud.run("collectCoin", {x: coin.x/32, y: coin.y/32})
+      } catch (err) {
+        console.log(err)
+      }
       text.setText(`Coins collected: ${coinScore}`); // set the text to show the current score
       return false;
   }
