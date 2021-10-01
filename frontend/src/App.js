@@ -12,7 +12,7 @@ import { MemoizedGame, Game, Leaderboard } from './Game.js'
 function App({ isProduction }) {
 
   const chain = isProduction ? "polygon" : "mumbai"
-  const NFT_ADDRESS = "0x1C44316e796879Ac7990D4cAD591a27138ba9Aa8"
+  const NFT_ADDRESS = "0xD725dcd6E4a37d992Eb76d859168ACb30Fdcd59f"
   const NFT_SYNBOL = "SNAIL"
 
   const options = {
@@ -33,7 +33,7 @@ function App({ isProduction }) {
   const [activeNFT, setActiveNFT] = useState([])
 
   const [amount, setAmount] = useState(1)
-  const price = amount * snailPrice
+  const price = snailPrice && amount ? snailPrice.mul(amount) : undefined
 
   async function fetchNFTs() {
     if (isAuthenticated) {
@@ -56,7 +56,7 @@ function App({ isProduction }) {
         setTotalSupply(totalSupply)
 
         const snailPrice = await Moralis.Web3API.native.runContractFunction({function_name: "snailPrice", ...options})
-        setSnailPrice(ethers.utils.parseUnits(snailPrice, "wei"))
+        setSnailPrice(ethers.BigNumber.from(snailPrice))
       }
     }
     init()
@@ -203,7 +203,7 @@ function App({ isProduction }) {
                     <input className="border text-center mr-5" type="number" min="1" max="100" value={amount} onChange={(e) => setAmount(e.target.value)} />
                   </div>
                   <div className="p-0 m-0">
-                    <span className="p-0 m-0 text-white text-xs">price: {price && ethers.utils.formatEther(price)} eth</span>
+                    <span className="p-0 m-0 text-white text-xs">price: {price && ethers.utils.formatEther(price)} MATIC</span>
                   </div>
                   <div className="p-0 m-0">
                     <span className="p-0 m-0 text-white text-xs">Available: {10000 - totalSupply} out of 10000</span>

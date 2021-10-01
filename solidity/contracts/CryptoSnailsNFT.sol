@@ -18,11 +18,11 @@ contract CryptoSnails is ERC721Enumerable, Ownable {
     Counters.Counter private _Ids;
 
     uint256 public MAX_SNAILS = 10000;
-    uint256 public snailPrice = 0.0005 ether;
+    uint256 public snailPrice = 50 ether;  // 50 matic
 
-    string private baseURI = "https://api.cryptosnails.io/token/";
+    string private baseURI = "ipfs://QmUmE5P3B7PHcLn688TYeasTCaijxyuFXsZ2PkLvE93tpr";
     
-    bool private saleActive = false;
+    bool public saleActive = false;
 
 
     constructor() ERC721("CryptoSnails", "SNAIL") {}
@@ -37,25 +37,25 @@ contract CryptoSnails is ERC721Enumerable, Ownable {
         return baseURI;
     }
 
+    function setPrice(uint256 price) external onlyOwner {
+        snailPrice = price;
+    }
+    
+    function setBaseURI(string memory uri) external onlyOwner {
+        baseURI = uri;
+    }    
+    
     function toogleSale() public onlyOwner {
         saleActive = !saleActive;
     }
 
-    function statusSale() public view returns (bool status){
-       return (saleActive);
-    }
-
-    function reserveSnails() public onlyOwner {
+    function reserveSnails(uint256 snailsAmount) public onlyOwner {
         uint i;
-        for (i = 0; i < 100; i++) {
+        for (i = 0; i < snailsAmount; i++) {
             _Ids.increment();
             uint256 newItemId = _Ids.current();
             _safeMint(msg.sender, newItemId);
         }
-    }
-
-    function withdrawTokens() external onlyOwner {  
-        ERC20 (tokenContractAddress).transfer(_owner, ERC20 (tokenContractAddress).balanceOf(address(this)));
     }
 
     function mint(uint256 snailsAmount) external payable {
@@ -67,14 +67,17 @@ contract CryptoSnails is ERC721Enumerable, Ownable {
         uint256 purchasePrice = snailPrice.mul(snailsAmount);
         require(msg.value >= purchasePrice, "Insufficient Amount");
 
-        payable(owner()).transfer(msg.value);
-
         for (uint i = 0; i < snailsAmount; i++) {
             _Ids.increment();
             uint256 newItemId = _Ids.current();
             _safeMint(msg.sender, newItemId);
         }
     }
+    
+    function withdraw() external onlyOwner {
+        uint256 balance = address(this).balance;
+        payable(msg.sender).transfer(balance);
+    }    
     
     function tokensOfOwner(address owner)
         external

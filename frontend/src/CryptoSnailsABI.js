@@ -132,7 +132,13 @@ export const abi = [
 		"type": "function"
 	},
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "snailsAmount",
+				"type": "uint256"
+			}
+		],
 		"name": "reserveSnails",
 		"outputs": [],
 		"stateMutability": "nonpayable",
@@ -208,6 +214,32 @@ export const abi = [
 		"type": "function"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "uri",
+				"type": "string"
+			}
+		],
+		"name": "setBaseURI",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			}
+		],
+		"name": "setPrice",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"name": "toogleSale",
 		"outputs": [],
@@ -254,6 +286,13 @@ export const abi = [
 		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "withdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -377,12 +416,12 @@ export const abi = [
 	},
 	{
 		"inputs": [],
-		"name": "snailPrice",
+		"name": "saleActive",
 		"outputs": [
 			{
-				"internalType": "uint256",
+				"internalType": "bool",
 				"name": "",
-				"type": "uint256"
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -390,12 +429,12 @@ export const abi = [
 	},
 	{
 		"inputs": [],
-		"name": "statusSale",
+		"name": "snailPrice",
 		"outputs": [
 			{
-				"internalType": "bool",
-				"name": "status",
-				"type": "bool"
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
