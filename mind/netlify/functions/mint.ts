@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 
 require("dotenv").config()
 
-const NODE_URL_POLYGON = "https://speedy-nodes-nyc.moralis.io/3e99daa93f8cf1e5719e36e3/polygon/mainnet"
+const isProd = true;
 
 const handler = async (event, context) => {
   const apiKey =  event.queryStringParameters.apiKey
@@ -14,10 +14,13 @@ const handler = async (event, context) => {
     };
   }
 
-  const address = "0x6B79D10a8eFA54dFca5a99705D3c97acA80b79E9"
+  const devAddress = "0x6B79D10a8eFA54dFca5a99705D3c97acA80b79E9"
+  const prodAddress = "0x69cA0E7233c68795dEcbEeC60E209Db2414EB8fb"
+  const address = isProd ? prodAddress : devAddress
   const NODE_URL_MUMBAI = "https://speedy-nodes-nyc.moralis.io/3e99daa93f8cf1e5719e36e3/polygon/mumbai"
+  const NODE_URL_POLYGON = "https://speedy-nodes-nyc.moralis.io/3e99daa93f8cf1e5719e36e3/polygon/mainnet"
 
-  const provider = new ethers.providers.JsonRpcProvider(NODE_URL_MUMBAI);
+  const provider = new ethers.providers.JsonRpcProvider(isProd ? NODE_URL_POLYGON : NODE_URL_MUMBAI);
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider)
   let contract = new ethers.Contract(address, abi, wallet)
   //contract = contract.connect(wallet)
