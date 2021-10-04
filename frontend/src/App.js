@@ -70,7 +70,7 @@ function App({ isProduction }) {
   useEffect(()=>{
     async function init() {      
       if (isInitialized) {
-        if (isAuthenticated) {
+        if (isAuthenticated && window.ethereum && window.ethereum.isMetaMask) {
           await switchNetwork()
           await fetchNFTs()
           setReady(true)
@@ -131,7 +131,9 @@ function App({ isProduction }) {
     if (!isAuthenticated) {
       await login() 
     }
-    setOverlay(false)
+    if (isAuthenticated) {
+      setOverlay(false)
+    }
   }
 
   function play() {
@@ -154,9 +156,13 @@ function App({ isProduction }) {
   }
 
   async function login() {
-    await enableWeb3()
-    await switchNetwork()
-    await authenticate({signingMessage: "CryptoSnails Auth"})
+    if (window.ethereum && window.ethereum.isMetaMask) {
+      await enableWeb3()
+      await authenticate({signingMessage: "CryptoSnails Auth"})
+      await switchNetwork()
+    } else {
+      alert("Please install Metamask wallet to use this website")
+    }
   }
 
   return (
